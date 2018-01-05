@@ -1,0 +1,14 @@
+1.Assets/Standard Assets目录或者Plugins（不可热更新的代码，程序入口）--->unity编译生成Assembly-CSharp-firstpass.dll。
+2.Assets/Scripts unity编译生成Assembly-CSharp.dll文件来进行热更新。或者自己写一个C#库工程生成自己的dll，要引用Assembly-CSharp-firstpass.dll。
+3.下载Assembly-CSharp.dll或者自己的dll文件到persistDataPath。
+4.Assembly-CSharp-firstpass.dll的程序入口中调用ILRuntime对Assembly-CSharp.dll或者自己的dll文件进行加载。
+5.加载完成后调用游戏逻辑主方法。
+
+1.写一个MonoBehaviour全的适配器。
+2.在void InitializeILRuntime里边注册appdomain.RegisterCrossBindingAdaptor(new MonoBehaviourAdapter());
+3.写一个AddComponent，GetComponent的重定向用来Unity调用dll入口的时候添加最初的脚本。
+appdomain.Invoke("gcy.TestMonoBehaviour", "RunTest2", null, gameObject);
+4.在Assembly-CSharp.dll中像unity中一样平时写代码即可。
+5.脚本要动态添加，值要动态初始化，组件要动态寻找即可。   
+
+6.程序入口Main.unity中GoFirstPassInit对象上挂一个FirstPassGameInit脚本来加载StreamingAssets/Assembly-CSharpReplace.dll的动态链接库。 Assembly-CSharpReplace.dll是 unity编译好的Assembly-CSharp.dll进行改名得来。
